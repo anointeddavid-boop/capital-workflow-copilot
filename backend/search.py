@@ -9,6 +9,15 @@ load_dotenv()
 MODEL_NAME = "BAAI/bge-small-en-v1.5"
 QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 
+_model = None
+
+
+def get_model():
+    global _model
+    if _model is None:
+        _model = SentenceTransformer(MODEL_NAME)
+    return _model
+
 
 def connect():
     return psycopg2.connect(
@@ -21,7 +30,7 @@ def connect():
 
 
 def search(question, size=1000, top_k=3):
-    model = SentenceTransformer(MODEL_NAME)
+    model = get_model()
     vec = model.encode([QUERY_PREFIX + question], normalize_embeddings=True)[0]
     vec_text = "[" + ",".join(f"{x:.6f}" for x in vec) + "]"
     conn = connect()
