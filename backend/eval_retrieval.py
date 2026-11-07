@@ -10,13 +10,13 @@ TOP_K = 4
 
 
 def main():
-    questions = json.load(open(QUESTIONS))
+    questions = json.load(open(sys.argv[1] if len(sys.argv) > 1 else QUESTIONS))
     filing = glob.glob("data/filings/*.txt")[0]
-    full_text = open(filing, encoding="utf-8").read().lower()
+    full_text = " ".join(open(filing, encoding="utf-8").read().lower().split())
 
     usable = []
     for q in questions:
-        if any(k.lower() in full_text for k in q["keywords"]):
+        if any(" ".join(k.lower().split()) in full_text for k in q["keywords"]):
             usable.append(q)
         else:
             print("Skipped (keywords not found in the filing):", q["question"])
@@ -31,7 +31,7 @@ def main():
             rows = search(q["question"], size=size, top_k=TOP_K)
             rank_found = None
             for rank, (source, chunk_id, content, score) in enumerate(rows, 1):
-                if any(k.lower() in content.lower() for k in q["keywords"]):
+                if any(" ".join(k.lower().split()) in " ".join(content.lower().split()) for k in q["keywords"]):
                     rank_found = rank
                     break
             if rank_found:

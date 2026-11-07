@@ -1,19 +1,42 @@
 {
   "500": {
-    "hit_rate": 1.0,
-    "mrr": 0.932,
-    "misses": []
+    "hit_rate": 0.824,
+    "mrr": 0.696,
+    "misses": [
+      "What are some of the primary uses of cash by the company?",
+      "What are the potential consequences if one of the company's investment funds performs poorly?",
+      "What is carried interest in the context of Blackstone's fund structures?",
+      "What types of restrictions may affect the ability of investment funds to sell securities from public portfolio companies?",
+      "What was the primary purpose of establishing the Bonus Deferral Plan in 2007?",
+      "What does Blackstone's cybersecurity program include to protect systems and data?",
+      "Who was comprised of in the compensation committee during 2025?",
+      "What would happen to Mr. Gray's deferred restricted common stock units if he had retired on December 31, 2025?",
+      "What factors did Mr. Schwarzman and Mr. Gray primarily base their 2025 compensation decisions on for named executive officers?"
+    ]
   },
   "1000": {
-    "hit_rate": 1.0,
-    "mrr": 0.932,
-    "misses": []
+    "hit_rate": 0.863,
+    "mrr": 0.717,
+    "misses": [
+      "What were the total proceeds from loans payable for Blackstone Inc. in 2025?",
+      "What is carried interest in the context of Blackstone's fund structures?",
+      "How are unvested participating Holdings Partnership Units treated during periods of loss in Blackstone Holdings?",
+      "What was the primary purpose of establishing the Bonus Deferral Plan in 2007?",
+      "When was the Second Amended and Restated Limited Partnership Agreement of Strategic Partners Fund Solutions Associates VII L.P. dated and when was it deemed effective?",
+      "Who was comprised of in the compensation committee during 2025?",
+      "How are dividends distributed to stockholders after Blackstone Holdings makes distributions to its partners?"
+    ]
   },
   "2000": {
-    "hit_rate": 0.909,
-    "mrr": 0.848,
+    "hit_rate": 0.882,
+    "mrr": 0.686,
     "misses": [
-      "Where is Blackstone headquartered?"
+      "What types of agreements does the company enter into with certain employees to protect its interests?",
+      "What were the total proceeds from loans payable for Blackstone Inc. in 2025?",
+      "What is the primary methodology used to determine fair values of private investments in equity, debt, or real estate properties?",
+      "How is the profit sharing percentage determined for Mr. Schwarzman's carried interest in new funds when there is a corresponding predecessor fund?",
+      "How much in total tax receivable agreement payments were made to holders of Blackstone Holdings Partnership Units subsequent to December 31, 2025?",
+      "How much did Segment Distributable Earnings increase for the year ended December 31, 2025 compared to 2024?"
     ]
   }
 }
