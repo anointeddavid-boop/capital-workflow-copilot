@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capital Workflow Copilot</title>
+<style>
+  :root { --ink:#1b2430; --muted:#5d6b7b; --line:#dde3ea; --bg:#f6f8fa; --card:#ffffff; --accent:#1f3a5f; --accent2:#e8eef6; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#e6ebf1; --muted:#9aa7b5; --line:#2c3642; --bg:#10151b; --card:#171e26; --accent:#7fa7d8; --accent2:#1f2a37; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--ink); line-height:1.55; }
+  .wrap { max-width:760px; margin:0 auto; padding:32px 18px 60px; }
+  h1 { font-size:26px; margin:0 0 6px; }
+  .sub { color:var(--muted); margin:0 0 22px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; }
+  .row { display:flex; gap:10px; }
+  input[type=text] { flex:1; font-size:16px; padding:12px 14px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); }
+  input[type=text]:focus { outline:2px solid var(--accent); }
+  button.ask { font-size:16px; padding:12px 20px; border:0; border-radius:8px; background:var(--accent); color:#fff; cursor:pointer; }
+  @media (prefers-color-scheme: dark) { button.ask { color:#10151b; } }
+  button.ask:disabled { opacity:.5; cursor:wait; }
+  .chips { margin:14px 0 0; display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { font-size:13px; padding:6px 10px; border:1px solid var(--line); border-radius:999px; background:var(--accent2); color:var(--ink); cursor:pointer; }
+  .chip:hover { border-color:var(--accent); }
+  #out { margin-top:20px; }
+  .answer { white-space:normal; }
+  .cite { display:inline-block; font-size:11px; font-weight:600; min-width:18px; text-align:center; padding:1px 5px; margin:0 2px; border-radius:4px; background:var(--accent2); color:var(--accent); vertical-align:super; }
+  .tools { margin-bottom:10px; }
+  .badge { display:inline-block; font-size:12px; padding:3px 9px; border-radius:999px; background:var(--accent2); color:var(--accent); margin-right:6px; }
+  h2 { font-size:14px; margin:18px 0 6px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .src { font-size:14px; color:var(--muted); margin:2px 0; }
+  .meta { font-size:13px; color:var(--muted); margin-top:14px; }
+  .err { color:#c0392b; }
+  footer { margin-top:28px; font-size:13px; color:var(--muted); }
+  footer a { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Capital Workflow Copilot</h1>
+  <p class="sub">Ask about Blackstone's latest annual report or a small table of fund data. Answers from the report come with their sources.</p>
+
+  <div class="card">
+    <div class="row">
+      <input id="q" type="text" placeholder="Ask a question" autocomplete="off">
+      <button id="go" class="ask">Ask</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div id="out"></div>
+
+  <footer>
+    The annual report is a real public SEC filing. The fund table is fictional. This is a portfolio project, not financial advice.
+    Code: <a href="https://github.com/anointeddavid-boop/capital-workflow-copilot">github.com/anointeddavid-boop/capital-workflow-copilot</a>
+  </footer>
+</div>
+
+<script>
+var examples = [
+  "Which fund had the highest 2024 return?",
+  "What does Blackstone say about the risks of its real estate business?",
+  "Which fund is the biggest, and what does Blackstone say about how it earns fees?",
+  "What is the best pizza restaurant in Chicago?"
+];
+var toolNames = { search_filings: "Annual report search", query_fund_data: "Fund database" };
+
+var q = document.getElementById("q");
+var go = document.getElementById("go");
+var out = document.getElementById("out");
+var chips = document.getElementById("chips");
+
+examples.forEach(function (text) {
+  var b = document.createElement("button");
+  b.className = "chip";
+  b.textContent = text;
+  b.onclick = function () { q.value = text; ask(); };
+  chips.appendChild(b);
+});
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function fmt(t) {
+  t = esc(t);
+  t = t.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  t = t.replace(/\[(\d+)\]/g, '<span class="cite">$1</span>');
+  return t.replace(/\n/g, "<br>");
+}
+
+function ask() {
+  var question = q.value.trim();
+  if (!question) { return; }
+  go.disabled = true;
+  out.innerHTML = '<div class="card">Working on it. The first question after a restart can take a little longer.</div>';
+  fetch("/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question: question })
+  })
+  .then(function (r) {
+    if (!r.ok) { throw new Error("The server answered with status " + r.status); }
+    return r.json();
+  })
+  .then(function (d) {
+    var html = '<div class="card">';
+    var seen = {};
+    var tools = "";
+    d.tools_used.forEach(function (t) {
+      if (!seen[t]) { seen[t] = 1; tools += '<span class="badge">' + esc(toolNames[t] || t) + "</span>"; }
+    });
+    if (tools) { html += '<div class="tools">' + tools + "</div>"; }
+    html += '<div class="answer">' + fmt(d.answer) + "</div>";
+    if (d.sources.length) {
+      html += "<h2>Sources</h2>";
+      d.sources.forEach(function (s, i) {
+        html += '<div class="src"><span class="cite">' + (i + 1) + "</span> " + esc(s.source) + ", chunk " + s.chunk_id + ", match score " + s.score + "</div>";
+      });
+    }
+    html += '<div class="meta">' + d.seconds + " seconds, " + d.tokens_in + " tokens in, " + d.tokens_out + " tokens out</div>";
+    html += "</div>";
+    out.innerHTML = html;
+  })
+  .catch(function (e) {
+    out.innerHTML = '<div class="card err">Something went wrong: ' + esc(e.message) + "</div>";
+  })
+  .then(function () { go.disabled = false; });
+}
+
+go.onclick = ask;
+q.addEventListener("keydown", function (e) { if (e.key === "Enter") { ask(); } });
+</script>
+</body>
+</html>
