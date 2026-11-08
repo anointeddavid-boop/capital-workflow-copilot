@@ -1,15 +1,24 @@
+import os
 import time
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from agent import run_agent
 
 app = FastAPI(title="Capital Workflow Copilot")
 
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+
 
 class Question(BaseModel):
     question: str
+
+
+@app.get("/")
+def home():
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
 @app.get("/health")
