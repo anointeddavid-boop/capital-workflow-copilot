@@ -15,8 +15,12 @@ SYSTEM = (
     "table of fund data. Pick the tool that fits the question, and use both if needed. "
     "Use only what the tools return. For text from the report, cite the source number "
     "in square brackets, like [2]. For numbers from the database, write (fund database). "
-    "If the tools do not give you enough to answer, say you don't have enough information. "
-    "Never answer from memory."
+    "Never answer from memory. "
+    "Stay close to the wording of the sources and do not add details they do not state. "
+    "If the question is not about Blackstone's report or the fund data, or the tools do not "
+    "give you enough to answer, reply with exactly this sentence and nothing else: "
+    "I don't have enough information in the filings to answer that. "
+    "Never add facts from general knowledge, even with a disclaimer."
 )
 
 TOOLS = [
