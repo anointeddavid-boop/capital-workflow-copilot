@@ -8,5 +8,17 @@ services:
     volumes:
       - copilot_pgdata:/var/lib/postgresql/data
 
+  api:
+    build: .
+    container_name: copilot-api
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
 volumes:
   copilot_pgdata:

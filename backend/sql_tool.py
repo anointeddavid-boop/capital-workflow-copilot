@@ -23,8 +23,8 @@ WRITE_WORDS = re.compile(
 
 def connect():
     return psycopg2.connect(
-        host="localhost",
-        port=5433,
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", "5433")),
         user=os.getenv("POSTGRES_RO_USER"),
         password=os.getenv("POSTGRES_RO_PASSWORD"),
         dbname=os.getenv("POSTGRES_DB"),
