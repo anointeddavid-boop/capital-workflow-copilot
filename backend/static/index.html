@@ -120,7 +120,7 @@ function ask() {
         html += '<div class="src"><span class="cite">' + (i + 1) + "</span> " + esc(s.source) + ", chunk " + s.chunk_id + ", match score " + s.score + "</div>";
       });
     }
-    html += '<div class="meta">' + d.seconds + " seconds, " + d.tokens_in + " tokens in, " + d.tokens_out + " tokens out</div>";
+    html += '<div class="meta">' + d.seconds + " seconds, " + d.tokens_in + " tokens in, " + d.tokens_out + " tokens out, about " + (d.cost_usd * 100).toFixed(2) + " cents</div>";
     html += "</div>";
     out.innerHTML = html;
   })

@@ -83,6 +83,8 @@ def run_agent(question):
                         out += f"[{len(sources)}] ({source}, chunk {chunk_id})\n{content}\n\n"
                 else:
                     res = ask_data(block.input["question"])
+                    tokens_in += res.get("tokens_in", 0)
+                    tokens_out += res.get("tokens_out", 0)
                     out = f"SQL used: {res['sql']}\nAnswer: {res['answer']}"
             except Exception as e:
                 out = f"Tool error: {e}"

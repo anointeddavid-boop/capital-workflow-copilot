@@ -45,7 +45,8 @@ def write_query(client, question):
         messages=[{"role": "user", "content": question}],
     )
     sql = msg.content[0].text.strip()
-    return sql.replace("```sql", "").replace("```", "").strip()
+    sql = sql.replace("```sql", "").replace("```", "").strip()
+    return sql, msg.usage.input_tokens, msg.usage.output_tokens
 
 
 def check_query(sql):
@@ -74,10 +75,10 @@ def run_query(sql):
 
 def ask_data(question):
     client = anthropic.Anthropic()
-    sql = write_query(client, question)
+    sql, a_in, a_out = write_query(client, question)
     clean, problem = check_query(sql)
     if problem:
-        return {"sql": sql, "answer": problem, "rows": []}
+        return {"sql": sql, "answer": problem, "rows": [], "tokens_in": a_in, "tokens_out": a_out}
     cols, rows = run_query(clean)
     table = [dict(zip(cols, r)) for r in rows]
     msg = client.messages.create(
@@ -88,7 +89,13 @@ def ask_data(question):
             {"role": "user", "content": f"Question: {question}\nQuery result: {table}"}
         ],
     )
-    return {"sql": clean, "answer": msg.content[0].text, "rows": table}
+    return {
+        "sql": clean,
+        "answer": msg.content[0].text,
+        "rows": table,
+        "tokens_in": a_in + msg.usage.input_tokens,
+        "tokens_out": a_out + msg.usage.output_tokens,
+    }
 
 
 def main():
